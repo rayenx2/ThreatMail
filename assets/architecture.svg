@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1180" viewBox="0 0 720 1180" font-family="Inter, Arial, sans-serif">
+  <rect width="720" height="1180" fill="#0a0f1e"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1e293b"/>
+    </marker>
+  </defs>
+
+  <rect x="180" y="20" width="360" height="60" rx="8" fill="#0f172a" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="360" y="45" text-anchor="middle" fill="#f1f5f9" font-size="15" font-weight="700">EMAIL INPUT</text>
+  <text x="360" y="65" text-anchor="middle" fill="#64748b" font-size="12">raw text</text>
+  <line x1="360" y1="80" x2="360" y2="120" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="130" y="120" width="460" height="90" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="2"/>
+  <text x="150" y="150" fill="#93c5fd" font-size="15" font-weight="700">IOC EXTRACTOR</text>
+  <text x="150" y="170" fill="#64748b" font-size="12">ioc_agent.py</text>
+  <text x="150" y="192" fill="#94a3b8" font-size="12">regex plus LLM extraction. URLs, emails, IOC flags: job scam,</text>
+  <text x="150" y="208" fill="#94a3b8" font-size="12">credential request, impersonation, data harvesting, urgency language</text>
+  <line x1="360" y1="210" x2="360" y2="250" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="130" y="250" width="460" height="90" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="2"/>
+  <text x="150" y="280" fill="#93c5fd" font-size="15" font-weight="700">THREAT ANALYZER</text>
+  <text x="150" y="300" fill="#64748b" font-size="12">threat_agent.py</text>
+  <text x="150" y="322" fill="#94a3b8" font-size="12">deterministic rule engine, base score 0 to 100. Signals: job scam</text>
+  <text x="150" y="338" fill="#94a3b8" font-size="12">pattern, data harvesting request, institution impersonation, urgency</text>
+  <line x1="360" y1="340" x2="360" y2="380" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="130" y="380" width="460" height="90" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="2"/>
+  <text x="150" y="410" fill="#93c5fd" font-size="15" font-weight="700">VIRUSTOTAL AGENT</text>
+  <text x="150" y="430" fill="#64748b" font-size="12">virustotal_agent.py</text>
+  <text x="150" y="452" fill="#94a3b8" font-size="12">VirusTotal API v3 URL reputation per detected link. Malicious,</text>
+  <text x="150" y="468" fill="#94a3b8" font-size="12">suspicious, harmless, undetected counts. Skips gracefully with no key</text>
+  <line x1="360" y1="470" x2="360" y2="510" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="130" y="510" width="460" height="90" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="2"/>
+  <text x="150" y="540" fill="#93c5fd" font-size="15" font-weight="700">MEMORY AGENT</text>
+  <text x="150" y="560" fill="#64748b" font-size="12">memory_agent.py</text>
+  <text x="150" y="582" fill="#94a3b8" font-size="12">pattern based scoring over known attack signatures. Multi signal</text>
+  <text x="150" y="598" fill="#94a3b8" font-size="12">attack bonus when three or more signals are present</text>
+  <line x1="360" y1="600" x2="360" y2="640" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="130" y="640" width="460" height="90" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="2"/>
+  <text x="150" y="670" fill="#93c5fd" font-size="15" font-weight="700">REASONING AGENT</text>
+  <text x="150" y="690" fill="#64748b" font-size="12">reasoning_agent.py</text>
+  <text x="150" y="712" fill="#94a3b8" font-size="12">Llama 3.3 70B via Groq synthesizes all agent outputs. Returns</text>
+  <text x="150" y="728" fill="#94a3b8" font-size="12">verdict, score, signals, SOC report, confidence</text>
+  <line x1="360" y1="730" x2="360" y2="770" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="130" y="770" width="460" height="80" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="2"/>
+  <text x="150" y="800" fill="#93c5fd" font-size="15" font-weight="700">REPORT WRITER</text>
+  <text x="150" y="820" fill="#64748b" font-size="12">reporting_agent.py</text>
+  <text x="150" y="840" fill="#94a3b8" font-size="12">Llama 3.3 70B via Groq produces a structured SOC incident report</text>
+  <line x1="360" y1="850" x2="360" y2="890" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="130" y="890" width="460" height="80" rx="8" fill="#0f172a" stroke="#f87171" stroke-width="2"/>
+  <text x="150" y="920" fill="#f87171" font-size="15" font-weight="700">CONFIDENCE SCORER</text>
+  <text x="150" y="940" fill="#64748b" font-size="12">confidence/scorer.py</text>
+  <text x="150" y="960" fill="#94a3b8" font-size="12">multi factor calibration across signals, LLM and rule agreement</text>
+  <line x1="360" y1="970" x2="360" y2="1010" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="180" y="1010" width="360" height="150" rx="8" fill="#0f172a" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="360" y="1038" text-anchor="middle" fill="#f1f5f9" font-size="15" font-weight="700">JSON RESPONSE</text>
+  <text x="200" y="1064" fill="#94a3b8" font-size="12">verdict: phishing, suspicious, or legit</text>
+  <text x="200" y="1084" fill="#94a3b8" font-size="12">risk_score: 0 to 100</text>
+  <text x="200" y="1104" fill="#94a3b8" font-size="12">confidence: overall, reliable, explanation, factors</text>
+  <text x="200" y="1124" fill="#94a3b8" font-size="12">reasoning: signals, soc_report, score</text>
+  <text x="200" y="1144" fill="#94a3b8" font-size="12">report: final_report, summary, recommendation</text>
+</svg>

@@ -1,0 +1,12 @@
+[
+  {
+    "domain": "paypal-secure-login.com",
+    "verdict": "phishing",
+    "risk_score": 95
+  },
+  {
+    "domain": "secure-microsoft-login.net",
+    "verdict": "phishing",
+    "risk_score": 92
+  }
+]

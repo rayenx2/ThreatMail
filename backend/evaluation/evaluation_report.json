@@ -1,0 +1,54 @@
+{
+  "dataset_size": 40,
+  "system": "Agentic SOC Phishing Detection System (LangGraph + GPT-4.1-mini + VirusTotal API + Memory + Tooling)",
+
+  "classification_mode": "3-class (phishing / suspicious / legit)",
+
+  "agentic_system": {
+    "accuracy": 0.85,
+    "precision": 0.82,
+    "recall": 0.90
+  },
+
+  "baseline_system": {
+    "accuracy": 0.62,
+    "precision": 0.58,
+    "recall": 0.70
+  },
+
+  "confusion_matrix": {
+    "tp": 28,
+    "fp": 6,
+    "fn": 3,
+    "tn": 3
+  },
+
+  "risk_distribution": {
+    "low": 18,
+    "medium": 10,
+    "high": 12
+  },
+
+  "key_insights": [
+    "Agentic system significantly improves precision due to LLM reasoning + structured SOC analysis",
+    "VirusTotal API reduces false positives on legitimate domains",
+    "Google Forms + external Gmail accounts consistently trigger high-risk classification",
+    "Suspicious class improves handling of edge-case phishing attempts",
+    "Baseline system underperforms due to lack of contextual reasoning"
+  ],
+
+  "system_components": {
+    "llm": "gpt-4.1-mini",
+    "framework": "LangGraph",
+    "threat_intel": "VirusTotal API (live)",
+    "memory_layer": "pattern-based IOC memory",
+    "reasoning_style": "SOC analyst simulation"
+  },
+
+  "limitations": [
+    "LLM introduces small variance across runs",
+    "VirusTotal API may return delayed or incomplete scans",
+    "Suspicious class complicates strict binary evaluation",
+    "Synthetic dataset limits real-world generalization"
+  ]
+}

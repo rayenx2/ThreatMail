@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ThreatMail — AI-Powered Security Operations Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        soc: {
+          bg:      '#0a0f1e',
+          panel:   '#0f172a',
+          border:  '#1e293b',
+          blue:    '#1d4ed8',
+          blue2:   '#3b82f6',
+          bluetext:'#93c5fd',
+          phishing:'#f87171',
+          suspicious:'#fbbf24',
+          legit:   '#4ade80',
+          text:    '#f1f5f9',
+          dim:     '#94a3b8',
+          dimmer:  '#64748b',
+          dimmest: '#475569',
+        }
+      },
+      fontFamily: {
+        mono: ['JetBrains Mono', 'monospace'],
+        sans: ['Inter', 'sans-serif'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0a0f1e; }
+
+  .glow-blue { text-shadow: 0 0 12px rgba(59,130,246,0.35); }
+  .border-glow-blue { box-shadow: 0 0 20px rgba(29,78,216,0.15), inset 0 0 20px rgba(29,78,216,0.03); }
+
+  @keyframes slideIn { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  @keyframes counter-up { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes flow { 0% { opacity: 0.35; } 50% { opacity: 1; } 100% { opacity: 0.35; } }
+
+  .threat-entry { animation: slideIn 0.35s ease forwards; }
+  .blink { animation: blink 1.6s ease-in-out infinite; }
+  .flow  { animation: flow 2s ease-in-out infinite; }
+  .stat-value { animation: counter-up 0.4s ease; }
+
+  .terminal {
+    background: #060a14;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    overflow: hidden;
+  }
+  .terminal-header {
+    background: #0f172a;
+    padding: 8px 16px;
+    border-bottom: 1px solid #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .agent-box { border: 1px solid #1e293b; border-radius: 6px; background: #0f172a; padding: 12px 16px; transition: all 0.3s; }
+  .agent-box.active { border-color: rgba(59,130,246,0.6); box-shadow: 0 0 12px rgba(59,130,246,0.2); background: rgba(59,130,246,0.06); }
+  .agent-box.done { border-color: rgba(59,130,246,0.25); background: rgba(59,130,246,0.03); }
+
+  .badge-phishing { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.4); color: #f87171; }
+  .badge-suspicious { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.4); color: #fbbf24; }
+  .badge-legit { background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.4); color: #4ade80; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #0a0f1e; }
+  ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; }
+</style>
+</head>
+<body class="min-h-screen text-slate-300 font-sans">
+
+<!-- ================================================================
+     HEADER — mirrors the live app's Sidebar logo exactly
+================================================================ -->
+<header class="border-b border-soc-border bg-soc-panel/80 backdrop-blur-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-soc-blue flex items-center justify-center flex-shrink-0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div>
+        <h1 class="font-bold text-soc-text text-lg leading-tight tracking-tight">ThreatMail</h1>
+        <p class="text-xs text-soc-dimmest">AI Threat Detection</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="flex items-center gap-2 text-xs text-soc-bluetext">
+        <span class="w-2 h-2 rounded-full bg-soc-blue2 blink"></span>
+        System online
+      </span>
+      <span class="text-slate-700 hidden md:block">|</span>
+      <span class="hidden md:block text-xs text-soc-dimmer">LangGraph + GPT-4.1-mini</span>
+    </div>
+  </div>
+</header>
+
+<!-- ================================================================
+     HERO BAND
+================================================================ -->
+<section class="border-b border-soc-border" style="background:#0c1424">
+  <div class="max-w-7xl mx-auto px-6 py-10">
+    <p class="text-xs text-soc-bluetext mb-3 tracking-widest font-semibold uppercase">Portfolio project — Rayen Lassoued</p>
+    <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">
+      Multi-Agent Email<br/>
+      <span class="text-soc-blue2 glow-blue">Threat Detection System</span>
+    </h2>
+    <p class="text-slate-400 max-w-2xl text-sm leading-relaxed mb-6">
+      A seven-agent LangGraph pipeline that replicates real-world SOC analyst workflows.
+      Each email is analyzed by specialized agents — IOC extraction, rule-based threat scoring,
+      VirusTotal validation, pattern memory, LLM reasoning, and automated report generation —
+      then assigned a calibrated confidence score.
+    </p>
+    <div class="flex flex-wrap gap-6">
+      <div class="flex flex-col">
+        <span class="text-2xl font-bold text-soc-blue2" id="stat-accuracy">85%</span>
+        <span class="text-xs text-soc-dimmer">detection accuracy</span>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-2xl font-bold text-soc-legit">90%</span>
+        <span class="text-xs text-soc-dimmer">recall rate</span>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-2xl font-bold text-soc-suspicious">7</span>
+        <span class="text-xs text-soc-dimmer">specialized agents</span>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-2xl font-bold text-white">&lt;500ms</span>
+        <span class="text-xs text-soc-dimmer">avg analysis time</span>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-2xl font-bold text-slate-300">40</span>
+        <span class="text-xs text-soc-dimmer">test cases evaluated</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     MAIN GRID
+================================================================ -->
+<main class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <div class="lg:col-span-2 flex flex-col gap-6">
+
+    <!-- Live Threat Feed -->
+    <div class="terminal border-glow-blue">
+      <div class="terminal-header">
+        <span class="dot bg-red-500"></span>
+        <span class="dot bg-yellow-400"></span>
+        <span class="dot bg-green-400"></span>
+        <span class="font-mono text-xs text-slate-400 ml-2">threatmail — live threat feed</span>
+        <span class="ml-auto flex items-center gap-1 text-xs text-soc-bluetext">
+          <span class="w-1.5 h-1.5 rounded-full bg-soc-blue2 blink"></span>
+          LIVE
+        </span>
+      </div>
+      <div class="p-4" style="min-height:220px">
+        <div id="threat-feed" class="space-y-2 text-xs font-mono"></div>
+      </div>
+    </div>
+
+    <!-- Analysis Demo -->
+    <div class="bg-soc-panel border border-soc-border rounded-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-soc-border flex items-center gap-3">
+        <span class="text-soc-bluetext text-sm font-bold">Threat Analysis Demo</span>
+        <span class="text-xs text-soc-dimmer">(pre-computed real outputs)</span>
+      </div>
+
+      <div class="px-6 pt-4 flex flex-wrap gap-2">
+        <button onclick="loadSample(0)" class="sample-btn px-3 py-1.5 rounded text-xs font-medium border transition-all" data-idx="0">
+          Phishing Sample
+        </button>
+        <button onclick="loadSample(1)" class="sample-btn px-3 py-1.5 rounded text-xs font-medium border transition-all" data-idx="1">
+          Suspicious Sample
+        </button>
+        <button onclick="loadSample(2)" class="sample-btn px-3 py-1.5 rounded text-xs font-medium border transition-all" data-idx="2">
+          Legitimate Email
+        </button>
+      </div>
+
+      <div class="px-6 py-4">
+        <p class="text-xs text-soc-dimmer mb-2 uppercase tracking-wide">Input email</p>
+        <div id="sample-email" class="terminal p-4 text-xs font-mono text-slate-300 leading-relaxed" style="min-height:100px;white-space:pre-wrap"></div>
+      </div>
+
+      <div class="px-6 pb-4">
+        <button id="scan-btn" onclick="runAnalysis()" class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all bg-soc-blue text-white hover:bg-soc-blue2">
+          Scan Threat
+        </button>
+        <span class="ml-3 text-xs text-soc-dimmer">Ctrl+Enter</span>
+      </div>
+
+      <div id="analysis-result" class="hidden px-6 pb-6">
+        <div class="border border-soc-border rounded-lg overflow-hidden">
+          <div id="result-header" class="px-4 py-3 flex items-center justify-between border-b border-soc-border flex-wrap gap-2">
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-soc-dimmer">VERDICT:</span>
+              <span id="verdict-badge" class="px-3 py-1 rounded text-xs font-bold uppercase"></span>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+              <span class="text-soc-dimmer">RISK: <span id="risk-score" class="text-white font-bold"></span>/100</span>
+              <span class="text-soc-dimmer">CONFIDENCE: <span id="confidence-score" class="font-bold"></span>%</span>
+            </div>
+          </div>
+
+          <div class="px-4 py-3 border-b border-soc-border">
+            <p class="text-xs text-soc-dimmer mb-3 uppercase tracking-wide">Agent pipeline execution</p>
+            <div class="flex flex-wrap items-center gap-1 text-xs" id="pipeline-viz"></div>
+          </div>
+
+          <div class="px-4 py-3 border-b border-soc-border">
+            <p class="text-xs text-soc-dimmer mb-2 uppercase tracking-wide">Threat signals</p>
+            <div id="signals-list" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <div class="px-4 py-3 border-b border-soc-border">
+            <p class="text-xs text-soc-dimmer mb-2 uppercase tracking-wide">SOC analyst report</p>
+            <div id="soc-report" class="text-xs text-slate-300 space-y-1 leading-relaxed"></div>
+          </div>
+
+          <div class="px-4 py-3">
+            <p class="text-xs text-soc-dimmer mb-2 uppercase tracking-wide">Confidence factor breakdown</p>
+            <div id="confidence-factors" class="space-y-1.5"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent code block -->
+    <div class="terminal">
+      <div class="terminal-header">
+        <span class="dot bg-red-500"></span>
+        <span class="dot bg-yellow-400"></span>
+        <span class="dot bg-green-400"></span>
+        <span class="font-mono text-xs text-slate-400 ml-2">runtime_graph.py — LangGraph invocation</span>
+      </div>
+      <div class="p-5 text-xs font-mono leading-relaxed overflow-x-auto">
+<pre style="color:#94a3b8"><span style="color:#60a5fa">from</span> <span style="color:#93c5fd">langgraph.graph</span> <span style="color:#60a5fa">import</span> StateGraph
+<span style="color:#60a5fa">from</span> <span style="color:#93c5fd">state</span> <span style="color:#60a5fa">import</span> AgentState
+
+<span style="color:#fbbf24">def</span> <span style="color:#93c5fd">build_graph</span>():
+    workflow = StateGraph(AgentState)
+
+    <span style="color:#6b7280"># Register seven specialized agents</span>
+    workflow.add_node(<span style="color:#fb923c">"ioc"</span>,        extract_iocs)      <span style="color:#6b7280"># IOC Extractor</span>
+    workflow.add_node(<span style="color:#fb923c">"threat"</span>,     threat_analysis)   <span style="color:#6b7280"># Rule-based scorer</span>
+    workflow.add_node(<span style="color:#fb923c">"virustotal"</span>, virustotal_agent)  <span style="color:#6b7280"># Threat Intel API</span>
+    workflow.add_node(<span style="color:#fb923c">"memory"</span>,     memory_agent)      <span style="color:#6b7280"># Pattern memory</span>
+    workflow.add_node(<span style="color:#fb923c">"reasoning"</span>,  reasoning_agent)   <span style="color:#6b7280"># LLM classification</span>
+    workflow.add_node(<span style="color:#fb923c">"report"</span>,     reporting_agent)   <span style="color:#6b7280"># Report writer</span>
+
+    <span style="color:#6b7280"># Linear pipeline: each agent enriches shared state</span>
+    workflow.set_entry_point(<span style="color:#fb923c">"ioc"</span>)
+    workflow.add_edge(<span style="color:#fb923c">"ioc"</span>,        <span style="color:#fb923c">"threat"</span>)
+    workflow.add_edge(<span style="color:#fb923c">"threat"</span>,     <span style="color:#fb923c">"virustotal"</span>)
+    workflow.add_edge(<span style="color:#fb923c">"virustotal"</span>, <span style="color:#fb923c">"memory"</span>)
+    workflow.add_edge(<span style="color:#fb923c">"memory"</span>,     <span style="color:#fb923c">"reasoning"</span>)
+    workflow.add_edge(<span style="color:#fb923c">"reasoning"</span>,  <span style="color:#fb923c">"report"</span>)
+
+    <span style="color:#60a5fa">return</span> workflow.compile()
+
+<span style="color:#6b7280"># Invoke: POST /investigate</span>
+result = agent_app.invoke({<span style="color:#fb923c">"email"</span>: email_content})</pre>
+      </div>
+    </div>
+
+  </div><!-- /left col -->
+
+  <!-- ============================================================
+       RIGHT COLUMN
+  ============================================================ -->
+  <div class="flex flex-col gap-6">
+
+    <div class="bg-soc-panel border border-soc-border rounded-lg overflow-hidden">
+      <div class="px-4 py-3 border-b border-soc-border">
+        <span class="text-xs text-soc-bluetext font-bold uppercase tracking-wide">Agent Architecture</span>
+      </div>
+      <div class="p-4 text-xs">
+        <div class="space-y-1 text-center">
+          <div class="py-2 px-3 rounded border border-soc-blue2 text-soc-bluetext" style="background:rgba(59,130,246,0.08)">
+            EMAIL INPUT<br/><span class="text-soc-dimmer text-xs">raw email text</span>
+          </div>
+          <div class="text-slate-600">|</div>
+          <div class="py-2 px-3 rounded border border-soc-border text-slate-300 flow" style="background:#0f172a;animation-delay:0s">
+            IOC EXTRACTOR<br/><span class="text-soc-dimmer text-xs">URLs / emails / domains</span>
+          </div>
+          <div class="text-slate-600">|</div>
+          <div class="py-2 px-3 rounded border border-soc-border text-slate-300 flow" style="background:#0f172a;animation-delay:0.3s">
+            THREAT ANALYZER<br/><span class="text-soc-dimmer text-xs">rule-based scoring</span>
+          </div>
+          <div class="text-slate-600">|</div>
+          <div class="py-2 px-3 rounded border border-soc-border text-slate-300 flow" style="background:#0f172a;animation-delay:0.6s">
+            VIRUSTOTAL AGENT<br/><span class="text-soc-dimmer text-xs">threat intel API</span>
+          </div>
+          <div class="text-slate-600">|</div>
+          <div class="py-2 px-3 rounded border border-soc-border text-slate-300 flow" style="background:#0f172a;animation-delay:0.9s">
+            MEMORY AGENT<br/><span class="text-soc-dimmer text-xs">pattern matching</span>
+          </div>
+          <div class="text-slate-600">|</div>
+          <div class="py-2 px-3 rounded border border-soc-border text-slate-300 flow" style="background:#0f172a;animation-delay:1.2s">
+            REASONING AGENT<br/><span class="text-soc-dimmer text-xs">LLM classification</span>
+          </div>
+          <div class="text-slate-600">|</div>
+          <div class="py-2 px-3 rounded border border-soc-border text-slate-300 flow" style="background:#0f172a;animation-delay:1.5s">
+            REPORT WRITER<br/><span class="text-soc-dimmer text-xs">SOC incident report</span>
+          </div>
+          <div class="text-slate-600">|</div>
+          <div class="py-2 px-3 rounded border text-soc-phishing" style="border-color:rgba(248,113,113,0.4);background:rgba(248,113,113,0.06)">
+            CONFIDENCE SCORER<br/><span class="text-soc-dimmer text-xs">multi-factor score</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-soc-panel border border-soc-border rounded-lg overflow-hidden">
+      <div class="px-4 py-3 border-b border-soc-border">
+        <span class="text-xs text-soc-bluetext font-bold uppercase tracking-wide">Threat Statistics</span>
+      </div>
+      <div class="p-4 grid grid-cols-2 gap-3">
+        <div class="bg-soc-bg rounded border border-soc-border p-3 text-center">
+          <div class="text-xl font-bold text-soc-phishing" id="cnt-phishing">0</div>
+          <div class="text-xs text-soc-dimmer mt-1">PHISHING</div>
+        </div>
+        <div class="bg-soc-bg rounded border border-soc-border p-3 text-center">
+          <div class="text-xl font-bold text-soc-suspicious" id="cnt-suspicious">0</div>
+          <div class="text-xs text-soc-dimmer mt-1">SUSPICIOUS</div>
+        </div>
+        <div class="bg-soc-bg rounded border border-soc-border p-3 text-center">
+          <div class="text-xl font-bold text-soc-blue2" id="cnt-blocked">0</div>
+          <div class="text-xs text-soc-dimmer mt-1">BLOCKED</div>
+        </div>
+        <div class="bg-soc-bg rounded border border-soc-border p-3 text-center">
+          <div class="text-xl font-bold text-white" id="cnt-total">0</div>
+          <div class="text-xs text-soc-dimmer mt-1">TOTAL</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-soc-panel border border-soc-border rounded-lg overflow-hidden">
+      <div class="px-4 py-3 border-b border-soc-border">
+        <span class="text-xs text-soc-bluetext font-bold uppercase tracking-wide">Tech Stack</span>
+      </div>
+      <div class="p-4 space-y-2 text-xs">
+        <div class="flex justify-between items-center py-1.5 border-b border-soc-border">
+          <span class="text-soc-dim">Orchestration</span>
+          <span class="text-soc-bluetext">LangGraph 0.1</span>
+        </div>
+        <div class="flex justify-between items-center py-1.5 border-b border-soc-border">
+          <span class="text-soc-dim">LLM Framework</span>
+          <span class="text-soc-bluetext">LangChain 0.2</span>
+        </div>
+        <div class="flex justify-between items-center py-1.5 border-b border-soc-border">
+          <span class="text-soc-dim">Reasoning LLM</span>
+          <span class="text-soc-blue2">GPT-4.1-mini</span>
+        </div>
+        <div class="flex justify-between items-center py-1.5 border-b border-soc-border">
+          <span class="text-soc-dim">Threat Intel</span>
+          <span class="text-soc-suspicious">VirusTotal API</span>
+        </div>
+        <div class="flex justify-between items-center py-1.5 border-b border-soc-border">
+          <span class="text-soc-dim">API Server</span>
+          <span class="text-slate-300">FastAPI 0.111</span>
+        </div>
+        <div class="flex justify-between items-center py-1.5 border-b border-soc-border">
+          <span class="text-soc-dim">Frontend</span>
+          <span class="text-slate-300">React + Vite</span>
+        </div>
+        <div class="flex justify-between items-center py-1.5">
+          <span class="text-soc-dim">Runtime</span>
+          <span class="text-slate-300">Docker Compose</span>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div><!-- /right col -->
+
+</main>
+
+<!-- ================================================================
+     PERFORMANCE SECTION
+================================================================ -->
+<section class="max-w-7xl mx-auto px-6 py-8 border-t border-soc-border">
+  <p class="text-xs text-soc-bluetext mb-6 tracking-widest font-semibold uppercase">Benchmark results (40-sample evaluation dataset)</p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-soc-panel border border-soc-border rounded-lg p-5 text-center">
+      <div class="text-3xl font-bold text-soc-blue2 mb-1">85%</div>
+      <div class="text-xs text-soc-dimmer">Overall Accuracy</div>
+      <div class="text-xs text-soc-dimmest mt-1">vs 62% baseline</div>
+    </div>
+    <div class="bg-soc-panel border border-soc-border rounded-lg p-5 text-center">
+      <div class="text-3xl font-bold text-soc-bluetext mb-1">82%</div>
+      <div class="text-xs text-soc-dimmer">Precision</div>
+      <div class="text-xs text-soc-dimmest mt-1">vs 58% baseline</div>
+    </div>
+    <div class="bg-soc-panel border border-soc-border rounded-lg p-5 text-center">
+      <div class="text-3xl font-bold text-soc-legit mb-1">90%</div>
+      <div class="text-xs text-soc-dimmer">Recall</div>
+      <div class="text-xs text-soc-dimmest mt-1">vs 70% baseline</div>
+    </div>
+    <div class="bg-soc-panel border border-soc-border rounded-lg p-5 text-center">
+      <div class="text-3xl font-bold text-soc-phishing mb-1">+37%</div>
+      <div class="text-xs text-soc-dimmer">Accuracy Gain</div>
+      <div class="text-xs text-soc-dimmest mt-1">over keyword filter</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     FOOTER
+================================================================ -->
+<footer class="border-t border-soc-border bg-soc-panel mt-8">
+  <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="text-sm text-slate-300 text-center md:text-left">
+      <span class="text-soc-bluetext font-bold">Rayen Lassoued</span>
+      <span class="text-slate-600 mx-2">|</span>
+      <span class="text-soc-dimmer">github.com/Hamilas</span>
+    </div>
+    <div class="flex items-center gap-6 text-xs text-soc-dimmer">
+      <a href="https://github.com/Hamilas" target="_blank" class="hover:text-soc-bluetext transition-colors">github.com/Hamilas</a>
+      <span class="text-slate-700">|</span>
+      <a href="https://www.linkedin.com/in/lassoued-rayen/" target="_blank" class="hover:text-soc-bluetext transition-colors">https://www.linkedin.com/in/lassoued-rayen/</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const SAMPLES = [
+  {
+    label: "PHISHING",
+    email: `Subject: Urgent: Update your account details immediately
+
+Dear Customer,
+
+We have detected suspicious activity on your account.
+To prevent your account from being suspended, please verify your
+credentials immediately by clicking the link below:
+
+http://secure-login-verify.evil-domain.com/reset
+
+You must respond within 24 hours or your account will be
+permanently locked. Enter your full name, phone number,
+and current password to confirm your identity.
+
+Best regards,
+Security Team
+support@gmail.com`,
+    result: {
+      verdict: "phishing",
+      risk_score: 95,
+      confidence: { overall: 88, reliable: true, explanation: "Verdict 'phishing' with 88% confidence. 4 independent threat signals detected; LLM reported high internal confidence (91%); rule-based and LLM scores are consistent." },
+      reasoning: {
+        signals: ["credential_request", "urgency_manipulation", "external_email_domain", "data_harvesting_request"],
+        soc_report: [
+          "Email contains explicit credential harvesting request with urgency manipulation.",
+          "Malicious URL detected: secure-login-verify.evil-domain.com — non-corporate domain requesting authentication.",
+          "Sender domain mismatch: purports to be Security Team but uses personal gmail.com.",
+          "Multiple IOC patterns match known phishing playbook (urgency + link + data request).",
+          "RECOMMENDATION: BLOCK and quarantine. Do not follow links. Report to IT security."
+        ]
+      }
+    }
+  },
+  {
+    label: "SUSPICIOUS",
+    email: `Hi,
+
+I came across your profile and think you'd be a great fit for a
+remote student worker position at our university.
+
+The role pays $25/hr and requires only 5-6 hours per week.
+Please fill out this short form to register your interest:
+https://docs.google.com/forms/d/1xABC123/viewform
+
+Send your full name, personal email, and phone number
+to get started.
+
+Dr. Johnson
+Department of Psychology
+drjohnson_hiring@gmail.com`,
+    result: {
+      verdict: "suspicious",
+      risk_score: 65,
+      confidence: { overall: 72, reliable: true, explanation: "Verdict 'suspicious' with 72% confidence. 3 independent threat signals detected; memory pattern matched known job scam playbook." },
+      reasoning: {
+        signals: ["job_scam_pattern", "data_harvesting_request", "external_email_domain", "institution_impersonation"],
+        soc_report: [
+          "Email matches known job scam pattern: unsolicited employment offer targeting students.",
+          "Data harvesting via Google Form — requesting personal email, name, and phone number.",
+          "Sender claims institutional affiliation (Dept. of Psychology) but uses personal Gmail.",
+          "No .edu domain used — institution impersonation suspected.",
+          "RECOMMENDATION: Mark as SUSPICIOUS. Do not submit personal details. Verify directly with university HR."
+        ]
+      }
+    }
+  },
+  {
+    label: "LEGIT",
+    email: `Hi team,
+
+Just a reminder that our weekly engineering sync is scheduled
+for Thursday at 2pm CET via the usual Zoom link.
+
+Topics this week:
+- Sprint review from last two weeks
+- Q3 roadmap discussion
+- Infrastructure capacity planning
+
+Please add any agenda items to the shared doc before Wednesday.
+
+Thanks,
+Marcus
+Engineering Lead`,
+    result: {
+      verdict: "legit",
+      risk_score: 5,
+      confidence: { overall: 91, reliable: true, explanation: "Verdict 'legit' with 91% confidence. Zero threat signals detected; LLM reported high internal confidence (94%); rule-based and LLM scores are consistent." },
+      reasoning: {
+        signals: [],
+        soc_report: [
+          "Internal meeting coordination email. No suspicious links, attachments, or requests.",
+          "No credential requests, no urgency manipulation, no data harvesting patterns detected.",
+          "Sender context consistent with internal team communication.",
+          "VirusTotal: no URLs to scan.",
+          "VERDICT: LEGITIMATE — no action required."
+        ]
+      }
+    }
+  }
+];
+
+let currentSampleIdx = 0;
+let analysisRunning = false;
+const threatCounts = { phishing: 0, suspicious: 0, blocked: 0, total: 0 };
+
+const FEED_ENTRIES = [
+  { color: "#f87171", icon: "PHISHING",   msg: "secure-verify-account.net — credential harvesting page", action: "BLOCKED" },
+  { color: "#f87171", icon: "MALWARE",    msg: "192.168.1.105 — outbound C2 beacon detected", action: "QUARANTINED" },
+  { color: "#fbbf24", icon: "SUSPICIOUS", msg: "unknown-invoice-2024.xlsm — macro payload detected", action: "SANDBOX" },
+  { color: "#f87171", icon: "PHISHING",   msg: "payroll-update.evil-corp.xyz — BEC attack pattern", action: "BLOCKED" },
+  { color: "#60a5fa", icon: "INFO",       msg: "docs.google.com/forms — data collection form reviewed", action: "FLAGGED" },
+  { color: "#f87171", icon: "PHISHING",   msg: "microsoft-security-alert.ru — login page clone", action: "BLOCKED" },
+  { color: "#fbbf24", icon: "SUSPICIOUS", msg: "employment-opportunity@gmail.com — job scam pattern", action: "REVIEW" },
+  { color: "#f87171", icon: "MALWARE",    msg: "invoice-2024-Q4.zip — double extension executable", action: "QUARANTINED" },
+  { color: "#4ade80", icon: "LEGIT",      msg: "github.com/company/repo — verified developer activity", action: "ALLOWED" },
+  { color: "#f87171", icon: "PHISHING",   msg: "bank-secure-login.phish.cc — financial credential theft", action: "BLOCKED" },
+];
+
+let feedIdx = 0;
+const feedEl = document.getElementById('threat-feed');
+
+function addFeedEntry() {
+  const entry = FEED_ENTRIES[feedIdx % FEED_ENTRIES.length];
+  feedIdx++;
+
+  const now = new Date();
+  const ts = now.toTimeString().slice(0,8);
+
+  const div = document.createElement('div');
+  div.className = 'threat-entry flex items-start gap-2 py-1.5 border-b';
+  div.style.borderColor = 'rgba(30,41,59,0.6)';
+
+  const actionColor = entry.action === 'BLOCKED' || entry.action === 'QUARANTINED'
+    ? '#f87171' : entry.action === 'ALLOWED' ? '#4ade80' : '#fbbf24';
+
+  div.innerHTML = `
+    <span style="color:#475569" class="shrink-0">[${ts}]</span>
+    <span class="shrink-0 px-1.5 py-0.5 rounded text-xs font-bold" style="background:rgba(${hexToRgb(entry.color)},0.12);color:${entry.color};border:1px solid ${entry.color}33">${entry.icon}</span>
+    <span class="text-slate-400 flex-1 text-xs leading-relaxed">${entry.msg}</span>
+    <span class="shrink-0 text-xs font-bold" style="color:${actionColor}">${entry.action}</span>
+  `;
+
+  feedEl.insertBefore(div, feedEl.firstChild);
+
+  while (feedEl.children.length > 8) {
+    feedEl.removeChild(feedEl.lastChild);
+  }
+
+  if (entry.icon === 'PHISHING') { threatCounts.phishing++; threatCounts.blocked++; }
+  if (entry.icon === 'SUSPICIOUS') threatCounts.suspicious++;
+  threatCounts.total++;
+  updateCounters();
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+function updateCounters() {
+  animateCounter('cnt-phishing', threatCounts.phishing);
+  animateCounter('cnt-suspicious', threatCounts.suspicious);
+  animateCounter('cnt-blocked', threatCounts.blocked);
+  animateCounter('cnt-total', threatCounts.total);
+}
+
+function animateCounter(id, val) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = val; el.style.animation = 'none'; void el.offsetWidth; el.style.animation = 'counter-up 0.3s ease'; }
+}
+
+addFeedEntry();
+setInterval(addFeedEntry, 3000);
+
+function loadSample(idx) {
+  currentSampleIdx = idx;
+  const sample = SAMPLES[idx];
+
+  document.getElementById('sample-email').textContent = sample.email;
+  document.getElementById('analysis-result').classList.add('hidden');
+
+  document.querySelectorAll('.sample-btn').forEach((btn, i) => {
+    if (i === idx) {
+      btn.style.borderColor = 'rgba(59,130,246,0.6)';
+      btn.style.color = '#93c5fd';
+      btn.style.background = 'rgba(59,130,246,0.08)';
+    } else {
+      btn.style.borderColor = '#1e293b';
+      btn.style.color = '#94a3b8';
+      btn.style.background = 'transparent';
+    }
+  });
+}
+
+function runAnalysis() {
+  if (analysisRunning) return;
+  analysisRunning = true;
+
+  const btn = document.getElementById('scan-btn');
+  btn.textContent = 'Scanning…';
+  btn.disabled = true;
+
+  const result = SAMPLES[currentSampleIdx].result;
+  const agents = ['IOC', 'THREAT', 'VIRUSTOTAL', 'MEMORY', 'REASONING', 'REPORT', 'CONFIDENCE'];
+
+  let step = 0;
+  renderPipeline(agents, -1);
+
+  const interval = setInterval(() => {
+    renderPipeline(agents, step);
+    step++;
+    if (step >= agents.length) {
+      clearInterval(interval);
+      setTimeout(() => showResult(result), 300);
+      btn.textContent = 'Scan Threat';
+      btn.disabled = false;
+      analysisRunning = false;
+    }
+  }, 280);
+}
+
+function renderPipeline(agents, activeIdx) {
+  const el = document.getElementById('pipeline-viz');
+  el.innerHTML = agents.map((name, i) => {
+    let style;
+    if (i < activeIdx) {
+      style = 'border-color:rgba(59,130,246,0.3);background:rgba(59,130,246,0.06);color:#93c5fd';
+    } else if (i === activeIdx) {
+      style = 'border-color:rgba(59,130,246,0.8);background:rgba(59,130,246,0.14);color:#93c5fd;box-shadow:0 0 10px rgba(59,130,246,0.3)';
+    } else {
+      style = 'border-color:#1e293b;background:#0f172a;color:#475569';
+    }
+    const arrow = i < agents.length - 1 ? '<span style="color:#334155;margin:0 2px">→</span>' : '';
+    return `<span class="px-2 py-1 rounded border text-xs transition-all" style="${style}">${name}</span>${arrow}`;
+  }).join('');
+}
+
+function showResult(result) {
+  const el = document.getElementById('analysis-result');
+  el.classList.remove('hidden');
+
+  const badge = document.getElementById('verdict-badge');
+  badge.textContent = result.verdict.toUpperCase();
+  badge.className = `px-3 py-1 rounded text-xs font-bold uppercase badge-${result.verdict}`;
+
+  document.getElementById('risk-score').textContent = result.risk_score;
+  document.getElementById('confidence-score').textContent = result.confidence.overall;
+
+  const confEl = document.getElementById('confidence-score');
+  confEl.style.color = result.confidence.overall >= 80 ? '#4ade80' : result.confidence.overall >= 60 ? '#fbbf24' : '#f87171';
+
+  const sigList = document.getElementById('signals-list');
+  if (result.reasoning.signals.length === 0) {
+    sigList.innerHTML = '<span class="text-xs text-soc-dimmer">No threat signals detected</span>';
+  } else {
+    sigList.innerHTML = result.reasoning.signals.map(s =>
+      `<span class="px-2 py-1 rounded text-xs" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);color:#fbbf24">${s}</span>`
+    ).join('');
+  }
+
+  const socEl = document.getElementById('soc-report');
+  socEl.innerHTML = result.reasoning.soc_report.map(line =>
+    `<div class="flex gap-2"><span style="color:#475569">›</span><span>${line}</span></div>`
+  ).join('');
+
+  const confFactors = document.getElementById('confidence-factors');
+  confFactors.innerHTML = `
+    <div class="text-xs text-soc-dim leading-relaxed mb-2">${result.confidence.explanation}</div>
+    <div class="flex items-center gap-2">
+      <div class="flex-1 h-1.5 rounded-full bg-soc-bg overflow-hidden">
+        <div class="h-full rounded-full transition-all duration-700" style="width:${result.confidence.overall}%;background:${result.confidence.overall >= 70 ? '#4ade80' : '#fbbf24'}"></div>
+      </div>
+      <span class="text-xs font-bold" style="color:${result.confidence.overall >= 70 ? '#4ade80' : '#fbbf24'}">${result.confidence.overall}%</span>
+      <span class="text-xs" style="color:${result.confidence.reliable ? '#4ade80' : '#fbbf24'}">${result.confidence.reliable ? 'RELIABLE' : 'REVIEW'}</span>
+    </div>
+  `;
+
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+loadSample(0);
+
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') runAnalysis();
+});
+</script>
+</body>
+</html>

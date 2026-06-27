@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0f1e"/>
+      <stop offset="100%" style="stop-color:#0f172a"/>
+    </linearGradient>
+    <!-- Blue accent gradient -->
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1d4ed8"/>
+      <stop offset="100%" style="stop-color:#3b82f6"/>
+    </linearGradient>
+    <!-- Glow filter for icon -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Subtle grid pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+    </pattern>
+    <!-- Right side glow -->
+    <radialGradient id="rightglow" cx="85%" cy="50%" r="40%">
+      <stop offset="0%" style="stop-color:#1d4ed8;stop-opacity:0.12"/>
+      <stop offset="100%" style="stop-color:#0a0f1e;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Base background -->
+  <rect width="1280" height="320" fill="url(#bg)"/>
+  <!-- Grid overlay -->
+  <rect width="1280" height="320" fill="url(#grid)" opacity="0.4"/>
+  <!-- Right glow -->
+  <rect width="1280" height="320" fill="url(#rightglow)"/>
+
+  <!-- Top border line -->
+  <rect x="0" y="0" width="1280" height="2" fill="url(#accent)" opacity="0.6"/>
+
+  <!-- Left accent stripe -->
+  <rect x="0" y="0" width="4" height="320" fill="url(#accent)"/>
+
+  <!-- ─── Shield Icon ─────────────────────────────────────────────────── -->
+  <g transform="translate(64, 112)" filter="url(#glow)">
+    <!-- Icon background -->
+    <rect width="96" height="96" rx="16" fill="#1d4ed8" opacity="0.9"/>
+    <!-- Shield path, scaled to fit -->
+    <g transform="translate(16, 12) scale(2.67, 2.67)">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+            fill="none" stroke="#ffffff" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Mail line hint inside shield -->
+      <path d="M8 11h8M8 14h5" stroke="#93c5fd" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+    </g>
+  </g>
+
+  <!-- ─── Brand name ─────────────────────────────────────────────────── -->
+  <text x="184" y="156" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+        font-size="64" font-weight="700" fill="#f1f5f9" letter-spacing="-2">
+    Threat<tspan fill="url(#accent)">Mail</tspan>
+  </text>
+
+  <!-- ─── Tagline ────────────────────────────────────────────────────── -->
+  <text x="186" y="198" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+        font-size="18" font-weight="400" fill="#64748b" letter-spacing="0.2">
+    AI-powered email threat detection · Six LangGraph agents · Groq · FastAPI · React
+  </text>
+
+  <!-- ─── Divider ────────────────────────────────────────────────────── -->
+  <line x1="184" y1="218" x2="760" y2="218" stroke="#1e293b" stroke-width="1"/>
+
+  <!-- ─── Stat badges ─────────────────────────────────────────────────── -->
+  <!-- Badge 1: Accuracy -->
+  <g transform="translate(184, 238)">
+    <rect width="110" height="34" rx="6" fill="#0f172a" stroke="#1e3a5f" stroke-width="1"/>
+    <text x="55" y="14" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+          font-size="10" fill="#475569" text-anchor="middle" letter-spacing="1" font-weight="600">ACCURACY</text>
+    <text x="55" y="28" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+          font-size="13" fill="#4ade80" text-anchor="middle" font-weight="700">85%</text>
+  </g>
+
+  <!-- Badge 2: Agents -->
+  <g transform="translate(306, 238)">
+    <rect width="110" height="34" rx="6" fill="#0f172a" stroke="#1e3a5f" stroke-width="1"/>
+    <text x="55" y="14" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+          font-size="10" fill="#475569" text-anchor="middle" letter-spacing="1" font-weight="600">AGENTS</text>
+    <text x="55" y="28" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+          font-size="13" fill="#93c5fd" text-anchor="middle" font-weight="700">6 LangGraph</text>
+  </g>
+
+  <!-- Badge 3: Model -->
+  <g transform="translate(428, 238)">
+    <rect width="150" height="34" rx="6" fill="#0f172a" stroke="#1e3a5f" stroke-width="1"/>
+    <text x="75" y="14" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+          font-size="10" fill="#475569" text-anchor="middle" letter-spacing="1" font-weight="600">MODEL</text>
+    <text x="75" y="28" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+          font-size="13" fill="#a78bfa" text-anchor="middle" font-weight="700">Llama 3.3 70B</text>
+  </g>
+
+  <!-- Badge 4: Verdicts -->
+  <g transform="translate(590, 238)">
+    <rect width="170" height="34" rx="6" fill="#0f172a" stroke="#1e3a5f" stroke-width="1"/>
+    <text x="85" y="14" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+          font-size="10" fill="#475569" text-anchor="middle" letter-spacing="1" font-weight="600">VERDICTS</text>
+    <!-- Phishing dot -->
+    <circle cx="24" cy="24" r="4" fill="#ef4444"/>
+    <text x="34" y="28" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+          font-size="11" fill="#f87171" font-weight="600">phishing</text>
+    <!-- Suspicious dot -->
+    <circle cx="98" cy="24" r="4" fill="#f59e0b"/>
+    <text x="108" y="28" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+          font-size="11" fill="#fbbf24" font-weight="600">suspicious</text>
+    <!-- Legit dot (offset below since width limit) -->
+  </g>
+
+  <!-- ─── Right side: pipeline visual ─────────────────────────────────── -->
+  <!-- Vertical pipeline labels on the right -->
+  <g transform="translate(900, 60)">
+    <!-- Vertical connector line -->
+    <line x1="12" y1="20" x2="12" y2="240" stroke="#1e3a5f" stroke-width="2"/>
+
+    <!-- Agent nodes -->
+    <!-- IOC -->
+    <circle cx="12" cy="20" r="8" fill="#1d4ed8"/>
+    <text x="30" y="25" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="13" fill="#93c5fd" font-weight="600">IOC Extractor</text>
+    <text x="30" y="40" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">URLs · emails · IOC flags</text>
+
+    <!-- Threat -->
+    <circle cx="12" cy="80" r="8" fill="#1d4ed8"/>
+    <text x="30" y="85" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="13" fill="#93c5fd" font-weight="600">Threat Analyzer</text>
+    <text x="30" y="100" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">Rule engine · base score 0–100</text>
+
+    <!-- VT -->
+    <circle cx="12" cy="140" r="8" fill="#1d4ed8"/>
+    <text x="30" y="145" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="13" fill="#93c5fd" font-weight="600">VirusTotal</text>
+    <text x="30" y="160" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">URL reputation API v3</text>
+
+    <!-- Reasoning -->
+    <circle cx="12" cy="200" r="8" fill="#1d4ed8"/>
+    <text x="30" y="205" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="13" fill="#93c5fd" font-weight="600">Reasoning LLM</text>
+    <text x="30" y="220" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">Llama 3.3 · verdict + signals</text>
+
+    <!-- Report -->
+    <circle cx="12" cy="252" r="8" fill="#4ade80"/>
+    <text x="30" y="257" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="13" fill="#4ade80" font-weight="600">SOC Report</text>
+    <text x="30" y="272" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">Incident report · recommendation</text>
+  </g>
+
+  <!-- ─── Bottom right: author ──────────────────────────────────────── -->
+  <text x="1216" y="306" font-family="'Inter', 'Segoe UI', Arial, sans-serif"
+        font-size="12" fill="#334155" text-anchor="end">
+    Rayen Lassoued · github.com/Hamilas
+  </text>
+
+  <!-- Bottom border -->
+  <rect x="0" y="318" width="1280" height="2" fill="#1e293b"/>
+</svg>
